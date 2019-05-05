@@ -9,12 +9,20 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-const db = {
-    client: 'pg',
-    connection: {
-      host : '127.0.0.1',
-      user : 'postgres',
-      password : 'admin',
-      database : 'postgres'
-    }
-  };
+const port = 3000;
+
+const db = knex({
+  client: 'pg',
+  connection: {
+    host : 'localhost',
+    user : 'postgres',
+    password : 'admin',
+    database : 'postgres'
+  }
+});
+
+app.get('/', (req,res) => res.send(db.users));
+
+app.listen(port, ()=> {
+  console.log(`app is running on port ${port}`);
+});
