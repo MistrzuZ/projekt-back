@@ -54,12 +54,11 @@ app.post('/login', (req, res) => {
           .then(user => {
             res.json(user[0])
           })
-          .catch(res.status(400).json('błąd podczas pobierania informacji z bazy danych'))
       } else {
         res.status(400).json('Błędny login/hasło')
       }
     })
-    .catch(res.status(400).json('Błędny login/hasło'))
+    .catch(err => res.status(400).json(err))
 })
 app.post('/rejestracja', (req, res) => {
   const { email, name, password } = req.body;
