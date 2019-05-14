@@ -3,10 +3,9 @@ const knex = require('knex');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt-nodejs');
+const Clarifai = require('clarifai');
 
 const app = express();
-
-const Clarifai = require('clarifai');
 
 const ClarifaiApp = new Clarifai.App({
     apiKey: 'df7583b5e4b548d5a42a3ceb025315d6'
@@ -32,9 +31,9 @@ app.get('/profil/:id', (req, res) => {
   const { id } = req.params;
   db.select('*').from('users').where({id})
   .then(user => {
-      if(user.length) {
+      if (user.length) {
           res.json(user)
-      }else{
+      } else {
           res.status(400).json('Nie znaleziono')
       }
   })
@@ -85,25 +84,20 @@ app.post('/rejestracja', (req, res) => {
       .then(trx.commit)
       .catch(trx.rollback)
   })
-  .catch(err => {
-      res.status(400).json(`${err} nie można zarejestrować`);
-  })
+  .catch(err => res.status(400).json('nie można zarejestrować'))
 })
-app.post('/zdjecie', (req, res) => {
+app.put('/zdjecie', (req, res) => {
   ClarifaiApp.models
   .predict(Clarifai.FACE_DETECT_MODEL, req.body.input)
-  .then(data => {
-    res.json(data);
-    const { id } = req.body;
-    db('users').where('id', '=', id)
-    .increment('uses', 1)
-    .returning('uses')
-    .then(entries => {
-      res.json(entries[0]);
-    })
-    .catch(res.status(400).json(`Błąd w doliczaniu użyć`))
-  })
-  .catch(res.status(400).json('Błąd z API Clarifai'))
+  .then(data =>res.json(data))
+  .catch(err => res.status(400).json('Bład z API Clarifai'))
+})
+app.put('/uzycia', (req, res) => {
+  db('users').where('id', '=', req.body.id)
+  .increment('uses', 1)
+  .returning('uses')
+  .then(data => res.json(data[0]))
+  .catch(err => res.status(400).json('Nie można pobrać ilości użyć'))
 })
 
 app.listen(port, ()=> {
