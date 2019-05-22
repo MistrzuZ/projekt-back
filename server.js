@@ -86,9 +86,16 @@ app.post('/rejestracja', (req, res) => {
   })
   .catch(err => res.status(400).json('nie można zarejestrować'))
 })
-app.put('/zdjecie', (req, res) => {
+app.put('/zdjecieTwarz', (req, res) => {
   ClarifaiApp.models
   .predict(Clarifai.FACE_DETECT_MODEL, req.body.input)
+  .then(data =>res.json(data))
+  .catch(err => res.status(400).json('Bład z API Clarifai'))
+})
+app.put('/zdjecieGeneral', (req, res) => {
+  ClarifaiApp.models
+  .initModel({id: Clarifai.GENERAL_MODEL, version: "aa7f35c01e0642fda5cf400f543e7c40"})
+  .then(generalModel => generalModel.predict(req.body.input, {language: 'en'}))
   .then(data =>res.json(data))
   .catch(err => res.status(400).json('Bład z API Clarifai'))
 })
@@ -100,6 +107,8 @@ app.put('/uzycia', (req, res) => {
   .catch(err => res.status(400).json('Nie można pobrać ilości użyć'))
 })
 
-app.listen(port, ()=> {
-  console.log(`app is running on port ${port}`);
+app.listen(process.env.PORT || port, ()=> {
+  console.log(`app is running on port ${process.env.PORT}`);
 });
+
+//https://protected-oasis-41147.herokuapp.com/
