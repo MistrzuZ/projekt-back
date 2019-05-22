@@ -16,18 +16,30 @@ app.use(cors());
 
 const port = 3000;
 
+
+// Połączenie dla hosta lokalnego
+// const db = knex({
+//   client: 'pg',
+//   connection: {
+//     host : 'localhost',
+//     user : 'postgres',
+//     password : 'admin',
+//     database : 'postgres'
+//   }
+// });
+
+
+// Połączenie dla servera heroku
 const db = knex({
   client: 'pg',
   connection: {
-    host : 'localhost',
-    user : 'postgres',
-    password : 'admin',
-    database : 'postgres'
+    connectionString: process.env.DATABASE_URL,
+    ssl: true
   }
-});
+})
 
-// app.get('/', (req,res) =>  db.select('*').from('users').then(data => res.send(data)));
-app.get('/', (req,res) =>  res.send('it working'));
+
+app.get('/', (req,res) =>  db.select('*').from('users').then(data => res.send(data)));
 app.get('/profil/:id', (req, res) => {
   const { id } = req.params;
   db.select('*').from('users').where({id})
@@ -112,4 +124,26 @@ app.listen(process.env.PORT || port, ()=> {
   console.log(`app is running on port ${process.env.PORT}`);
 });
 
-//https://protected-oasis-41147.herokuapp.com/
+// https://protected-oasis-41147.herokuapp.com/
+
+// heroku pg:psql - wywołanie okna edycji sql w bazie danych heroku
+// \d do sprawdzenia bazy danych
+
+// CREATE TABLE public.users (
+// 	id serial NOT NULL,
+// 	name varchar(100) NULL,
+// 	email text NOT NULL,
+// 	uses int8 NULL DEFAULT 0,
+// 	joined timestamp NOT NULL,
+// 	CONSTRAINT users_email_key UNIQUE (email),
+// 	CONSTRAINT users_pkey PRIMARY KEY (id)
+// );
+
+
+// CREATE TABLE public.login (
+// 	id serial NOT NULL,
+// 	hash varchar(100) NOT NULL,
+// 	email text NOT NULL,
+// 	CONSTRAINT login_email_key UNIQUE (email),
+// 	CONSTRAINT login_pkey PRIMARY KEY (id)
+// );
