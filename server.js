@@ -26,7 +26,8 @@ const db = knex({
   }
 });
 
-app.get('/', (req,res) =>  db.select('*').from('users').then(data => res.send(data)));
+// app.get('/', (req,res) =>  db.select('*').from('users').then(data => res.send(data)));
+app.get('/', (req,res) =>  res.send('it working'));
 app.get('/profil/:id', (req, res) => {
   const { id } = req.params;
   db.select('*').from('users').where({id})
